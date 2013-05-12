@@ -2,6 +2,15 @@
 
 '''
 A few functons to get started with the PiFace IO Board.
+
+Notes on the Python code: (i) use on(7) and
+off(7) to turn the LED on an off manually; 7 is the pin
+the LED is wired to; (ii) use code&gt;blink(7) for a more
+exciting test; (iii) use code&gt;read(0) to read the switch,
+which is attached to pin 0; (iv) use code&gt;control(7,0) to
+control LED on pin 7 by the switch on pin 0.  Of course all this is
+ridiculous overkill, but the idea is to get started.
+
 '''
 
 # Run this before runnng python: sudo modprobe spi-bcm2708 
