@@ -37,7 +37,7 @@ Let the switch have terminals A and B.
 
 '''
 
-
+import sys
 import time
 import RPi.GPIO as GPIO
 
@@ -50,10 +50,10 @@ WAITING = 0
 DOWN = 1
 UP = 2
 
-NAPTIME = 0.01  # time in seconds that hte  program stays in sleep mode.  
-                # A value of 0.01 seconds works and lowers the cpu load 
-                # from 95% to 1.  If NAPTIME is too long, the program 
-                # will respond poorly to user input.
+NAPTIME = 0.004  # time in seconds that hte  program stays in sleep mode.  
+                 # A value of 0.01 seconds works and lowers the cpu load 
+                 # from 95% to 1.  If NAPTIME is too long, the program 
+                 # will respond poorly to user input.
 
 
 def setup(outputPin, inputPin):
@@ -86,16 +86,17 @@ def simpleRead(inputPin):
 def read(inputPin):
   '''Read PIN and report how long it was pressed.'''
   state = WAITING
+  count = 0
   while True:
     if (state == WAITING) & GPIO.input(inputPin):
       state = DOWN
       start_time = time.time()
-      print("ON")
+      count = count + 1
+      print("%5d ON" % count)
     if (state == DOWN) & (not GPIO.input(inputPin)):
       state = UP
       elapsed_time = time.time() - start_time
-      print("%1.2f" % elapsed_time)
-      print("OFF\n")
+      print("      %1.2f" % elapsed_time)
     if state == UP:
       state = WAITING 
     time.sleep(NAPTIME)  # Sleep for a short while
@@ -129,5 +130,14 @@ def control(outputPin, inputPin):
 
 if __name__ == '__main__':
   setup(LED, SWITCH)
-  control(LED, SWITCH)
-
+  if (len(sys.argv) == 2):
+    if (sys.argv[1] == "blink"):
+      blink(LED, 0.1, 0.3)
+    elif (sys.argv[1] == "read"):
+      read(SWITCH)
+    elif (sys.argv[1] == "control"):
+      control(LED, SWITCH)
+    else:
+      print("Options: blink, read, control")
+  else:
+    print("Options: blink, read, control")
