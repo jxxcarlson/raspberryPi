@@ -104,17 +104,18 @@ def control(outputPin, inputPin):
   '''Read the inputPin and report how long it was pressed.
   Switch the outputPin betwen HIGH and LOW when the inputPin is HIGH.'''
   state = WAITING
+  count = 0
   while True:
     if (state == WAITING) & GPIO.input(inputPin):
       state = DOWN
       start_time = time.time()
       GPIO.output(outputPin,1)
-      print("ON")
+      count = count + 1
+      print("%5d ON" % count)
     if (state == DOWN) & (not GPIO.input(inputPin)):
       state = UP
       elapsed_time = time.time() - start_time
-      print("%1.2f" % elapsed_time)
-      print("OFF\n")
+      print("      %1.2f" % elapsed_time)
     if (state == DOWN) & GPIO.input(inputPin):
       elapsed_time = time.time() - start_time
       if elapsed_time % 0.5 < 0.2:
@@ -129,3 +130,4 @@ def control(outputPin, inputPin):
 if __name__ == '__main__':
   setup(LED, SWITCH)
   control(LED, SWITCH)
+
