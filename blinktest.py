@@ -50,6 +50,8 @@ parser.add_argument('-p', action="store_true", dest="p", help='Print pin map')
 
 args = parser.parse_args()
 
+print(args)
+
 if args.b:
   PIN = B2G[args.b]
   print("RPi: %d" % args.b)
@@ -60,10 +62,11 @@ if args.g:
   print("GPIO: %d" %args.g)
   run()
 
-if args.w:
-  PIN = W2G[args.w]
+if args.w > -1:
   print("Wiring Pi: %d" % args.w)
+  PIN = W2G[args.w]
   run()
 
 if args.p:
   printDictionary()
+
