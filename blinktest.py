@@ -1,18 +1,29 @@
 #!/usr/bin/env python
 
+# Test GPIO pins by blinking attadched LEDs
+
 import sys
+import argparse
 import time
 import RPi.GPIO as GPIO
 
 HIGH = 1
 LOW = 0
 
-Q2W = { 0:17, 1:18, 2:21, 3:22, 4:23, 5:24, 6:25, 7:4 }
+W2G = { 0:17, 1:18, 2:21, 3:22, 4:23, 5:24, 6:25, 7:4 }
+B2G = { 7:4, 11:17, 12:18, 13:21, 15:22, 16:23, 18:24, 22:25 }
 
-def setup(outputPin):
-  '''Call setup() before doing anything else.'''
-  GPIO.setmode(GPIO.BCM)
-  # GPIO.setmode(GPIO.BOARD)
+def printDictionary():
+
+  print("")
+  print("  Mapping from Wiring Pi to GPIO\n")
+  for key in W2G.keys():
+    print("    %2d ==> %2d" % (key, W2G[key]))
+  print("")
+  print("  Mapping from RPi Board to GPIO\n")
+  for key in B2G.keys():
+    print("    %2d ==> %2d" % (key, B2G[key]))
+  print("")
 
 
 def blink(LED, on, off):
@@ -24,43 +35,35 @@ def blink(LED, on, off):
     time.sleep(off)
 
 
-args = sys.argv
-
-def message():
-  print("")
-  print("  blink OPTION PIN, where OPTION  = -g|-b|-w")
-  print("  -g  == GPIO numbering, RPi board numberuing, -w = WIRING PI")
-  print("")
-
-mode = "-g"
-
-if len(args) == 3:
-
-  mode = args[1]
-  PIN = int (args[2])
-
-  if mode == "-g": 
-    GPIO.setmode(GPIO.BCM)
-  elif mode == "-b":
-    GPIO.setmode(GPIO.BOARD)
-  elif mode == "-w":
-    GPIO.setmode(GPIO.BCM)
-  else:
-    message(); exit();
-
-elif len(args) == 2:
-  if args[1] == "-h":
-    message(); exit();
-  else:
-    PIN = int (args[1])
-    GPIO.setmode(GPIO.BCM)
+def run():
+  GPIO.setmode(GPIO.BCM)
+  GPIO.setup(PIN, GPIO.OUT)
+  blink( PIN, 0.1, 0.3  )
 
 
-if mode == "-w":
-  PIN = Q2W[PIN]
+parser = argparse.ArgumentParser(description='Test GPIO pins by blinking them')
 
-if len(args) == 1:
-  message(); exit()
+parser.add_argument('-b', action="store", dest="b", type=int, help='RPi board pin mode')
+parser.add_argument('-g', action="store", dest="g", type=int, help='GPIO pin mode')
+parser.add_argument('-w', action="store", dest="w", type=int, help='Wiring Pi pin mode')
+parser.add_argument('-p', action="store_true", dest="p", help='Print pin map')
 
-GPIO.setup(PIN, GPIO.OUT)
-blink( PIN, 0.1, 0.3  )
+args = parser.parse_args()
+
+if args.b:
+  PIN = B2G[args.b]
+  print("RPi: %d" % args.b)
+  run()
+
+if args.g:
+  PIN = args.g
+  print("GPIO: %d" %args.g)
+  run()
+
+if args.w:
+  PIN = W2G[args.w]
+  print("Wiring Pi: %d" % args.w)
+  run()
+
+if args.p:
+  printDictionary()
